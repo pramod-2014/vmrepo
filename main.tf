@@ -2,52 +2,85 @@ terraform {
   required_providers {
     azurerm = {
       source  = "hashicorp/azurerm"
-      version = "4.35.0"
+      version = "4.37.0"
     }
   }
 }
 
 provider "azurerm" {
-  features {}
+  features {
+
+  }
   subscription_id = "a29ac6ee-0d4f-41fe-8359-df26a6fce56c"
 }
 
 
-
-resource "azurerm_resource_group" "rgblock" {
-name = "demo-rg"
-location = "Central India"
-    }
-    
-
-
-} 
-
-resource "azurerm_virtual_network" "demo-vnet" {
-  depends_on = [azurerm_resource_group.rgblock]
-  name                = "demo-vnet"
-  address_space       = ["10.0.0/16"]
-  location            = azurerm_resource_group.rgblock.location
-  resource_group_name = azurerm_resource_group.rgblock.name
+resource "azurerm_resource_group" "example" {
+  name     = "vm-rg"
+  location = "Central India"
+  
 }
 
-resource "azurerm_subnet" "demo-subnet" {
-  depends_on = [azurerm_virtual_network.demo-vnet]
-  name                 = "demo-subnet"
-  resource_group_name  = azurerm_resource_group.rgblock.name
-  virtual_network_name = azurerm_virtual_network.demo-vnet.name
-  address_prefixes     = ["10.0.0.0/24"]
+resource "azurerm_virtual_network" "main" {
+  name                = "test-vm"
+  address_space       = ["10.0.0.0/16"]
+  location            = azurerm_resource_group.example.location
+  resource_group_name = azurerm_resource_group.example.name
 }
 
-resource "azurerm_network_interface" "demo-nic" {
-  depends_on = [azurerm_subnet.demo-subnet]
-  name                = "demo-nic"
-  location            = azurerm_resource_group.rgblock.location
-  resource_group_name = azurerm_resource_group.rgblock.name
+resource "azurerm_subnet" "internal" {
+  name                 = "internal"
+  resource_group_name  = azurerm_resource_group.example.name
+  virtual_network_name = azurerm_virtual_network.main.name
+  address_prefixes     = ["10.0.2.0/24"]
+}
+
+resource "azurerm_network_interface" "main" {
+  name                = "test-nic"
+  location            = azurerm_resource_group.example.location
+  resource_group_name = azurerm_resource_group.example.name
 
   ip_configuration {
-    name                          = "internal"
-    subnet_id                     = azurerm_subnet.demo-subnet.id
+    name                          = "testconfiguration1"
+    subnet_id                     = azurerm_subnet.internal.id
     private_ip_address_allocation = "Dynamic"
+  }
+}
+
+resource "azurerm_virtual_machine" "main" {
+  name                  = "test-vnet"
+  location              = azurerm_resource_group.example.location
+  resource_group_name   = azurerm_resource_group.example.name
+  network_interface_ids = [azurerm_network_interface.main.id]
+  vm_size               = "Standard_DS1_v2"
+
+  # Uncomment this line to delete the OS disk automatically when deleting the VM
+  # delete_os_disk_on_termination = true
+
+  # Uncomment this line to delete the data disks automatically when deleting the VM
+  # delete_data_disks_on_termination = true
+
+  storage_image_reference {
+    publisher = "Canonical"
+    offer     = "0001-com-ubuntu-server-jammy"
+    sku       = "22_04-lts"
+    version   = "latest"
+  }
+  storage_os_disk {
+    name              = "myosdisk1"
+    caching           = "ReadWrite"
+    create_option     = "FromImage"
+    managed_disk_type = "Standard_LRS"
+  }
+  os_profile {
+    computer_name  = "hostname"
+    admin_username = "testadmin"
+    admin_password = "Password1234!"
+  }
+  os_profile_linux_config {
+    disable_password_authentication = false
+  }
+  tags = {
+    environment = "staging"
   }
 }
