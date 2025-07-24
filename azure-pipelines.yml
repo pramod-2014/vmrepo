@@ -13,13 +13,13 @@ stages:
           name: 'Infra-Runners-pool'  # Replace with your actual self-hosted agent pool name
 
         steps:
-          # Install Terraform
+          # Step 1: Install Terraform
           - task: TerraformInstaller@1
             displayName: "Install Terraform"
             inputs:
               terraformVersion: '1.5.0'
 
-          # Azure Login using Service Connection
+          # Step 2: Azure Login using Service Connection
           - task: AzureCLI@2
             displayName: 'Azure Login'
             inputs:
@@ -30,6 +30,31 @@ stages:
                 echo "Logged into Azure"
               addSpnToEnvironment: true
 
-          # Set environment variables for Terraform authentication
+          # Step 3: Set env variables for Terraform
           - powershell: |
               Write-Host "Setting environment variables for Terraform..."
+              echo "##vso[task.setvariable variable=ARM_CLIENT_ID]$env:servicePrincipalId"
+              echo "##vso[task.setvariable variable=ARM_CLIENT_SECRET]$env:servicePrincipalKey"
+              echo "##vso[task.setvariable variable=ARM_SUBSCRIPTION_ID]$env:subscriptionId"
+              echo "##vso[task.setvariable variable=ARM_TENANT_ID]$env:tenantId"
+            displayName: 'Set Terraform Azure credentials'
+
+          # Step 4: Terraform Init
+          - script: terraform init
+            displayName: "Terraform Init"
+
+          # Step 5: Terraform Validate
+          - script: terraform validate
+            displayName: "Terraform Validate"
+
+          # Step 6: Terraform Plan
+          - script: terraform plan -out=tfplan
+            displayName: "Terraform Plan"
+
+          # (Optional Debug Step)
+          - script: terraform show tfplan
+            displayName: "Show Plan Output"
+
+          # Step 7: Terraform Apply
+          - script: terraform apply -auto-approve tfplan
+            displayName: "Terraform Apply"
