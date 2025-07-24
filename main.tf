@@ -15,12 +15,11 @@ provider "azurerm" {
 
 
 resource "azurerm_resource_group" "rgblock" {
-    for_each = {
-        var.rg_name = var.locaton
+name = "demo-rg"
+location = "Central India"
     }
     
- name = each.key
- location = each.value
+
 
 } 
 
