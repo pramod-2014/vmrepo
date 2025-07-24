@@ -1,13 +1,7 @@
 trigger:
   branches:
     include:
-      - main   # jab main branch me push hoga tab pipeline chalega
-
-variables:
-  ARM_CLIENT_ID: $(ARM_CLIENT_ID)
-  ARM_CLIENT_SECRET: $(ARM_CLIENT_SECRET)
-  ARM_SUBSCRIPTION_ID: $(ARM_SUBSCRIPTION_ID)
-  ARM_TENANT_ID: $(ARM_TENANT_ID)
+      - main
 
 stages:
   - stage: Deploy_VM
@@ -16,9 +10,9 @@ stages:
       - job: Terraform_Apply
         displayName: "Apply Terraform Code"
         pool:
-          vmImage: 'ubuntu-latest'
-        steps:
+          name: 'Infra-Runners-pool'  # Replace with your actual self-hosted agent pool name
 
+        steps:
           - task: TerraformInstaller@1
             displayName: "Install Terraform"
             inputs:
@@ -35,4 +29,5 @@ stages:
 
           - script: terraform apply -auto-approve tfplan
             displayName: "Terraform Apply"
+
 
