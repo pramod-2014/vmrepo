@@ -1,0 +1,18 @@
+trigger:
+  branches:
+    include:
+      - main  # Ya jo bhi branch tu use karta hai
+
+pool:
+  name: 'Infra-Runners-pool'  # ✅ Tera self-hosted agent pool
+
+steps:
+  - task: AzureCLI@2
+    displayName: "Test Service Connection"
+    inputs:
+      azureSubscription: 'Dev-ServiceConnection'  # ✅ Tera federated service connection name
+      scriptType: 'bash'
+      scriptLocation: 'inlineScript'
+      inlineScript: |
+        echo "✅ Testing Azure login with federated credentials..."
+        az account show
