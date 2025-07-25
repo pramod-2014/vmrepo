@@ -10,7 +10,7 @@ steps:
   - task: AzureCLI@2
     displayName: "Test Service Connection"
     inputs:
-      azureSubscription: 'Dev-ServiceConnection'  # ✅ Tera federated service connection name
+      azureSubscription: 'DevOps-service-connection'  # ✅ Tera federated service connection name
       scriptType: 'bash'
       scriptLocation: 'inlineScript'
       inlineScript: |
