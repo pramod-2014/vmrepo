@@ -3,7 +3,14 @@ trigger:
 pool:
   name: Infra-Runners-pool
 
-steps:
-- script: echo "hello this is script from azure piple line"
-  displayName: hello this is script from azure piple line
+stages:
+- stage: DevopsPackage
+  displayName: "DevOps Package"
+  jobs:
+  - job: job1
+    displayName: "job1"
+    steps:
+    - script: echo "40 lacs package"
+
+
    
