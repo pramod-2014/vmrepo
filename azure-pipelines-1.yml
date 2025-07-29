@@ -1,8 +1,0 @@
-- task: AzureCLI@2
-  displayName: "Test Service Connection"
-  inputs:
-    azureSubscription: 'Dev-ServiceConnection'
-    scriptType: 'bash'
-    scriptLocation: 'inlineScript'
-    inlineScript: |
-      az account show
