@@ -12,5 +12,14 @@ stages:
     steps:
     - script: echo "40 lacs package"
 
+- stage:
+  displayName: "OneCroreGoul"
+  dependsOn: DevopsPackage
+  jobs:
+  - job: job2
+    displayName: "One Crore Goul"
+    steps:
+    - powershell: echo "1 corore targate"
+
 
    
