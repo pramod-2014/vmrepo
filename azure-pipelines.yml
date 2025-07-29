@@ -1,0 +1,9 @@
+trigger:
+- main
+pool:
+  name: Infra-Runners-pool
+
+steps:
+- script: echo "hello this is script from azure piple line"
+  displayName: hello this is script from azure piple line
+   
