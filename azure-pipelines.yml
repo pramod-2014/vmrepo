@@ -12,7 +12,7 @@ stages:
     steps:
     - script: echo "40 lacs package"
 
-- stage:
+- stage: OneCroreGoul
   displayName: "OneCroreGoul"
   dependsOn: DevopsPackage
   jobs:
@@ -20,6 +20,15 @@ stages:
     displayName: "One Crore Goul"
     steps:
     - powershell: echo "1 corore targate"
+
+- stage: worldTour
+  displayName: worldTour
+  dependsOn: OneCroreGoul
+  jobs:
+  - job: job3
+    displayName: worldTour
+    steps: 
+    - powershell: echo "World Tour after achieved one crore targate"
 
 
    
